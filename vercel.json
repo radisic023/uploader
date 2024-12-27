@@ -5,7 +5,9 @@
             "src": "server.js",
             "use": "@vercel/node",
             "config": {
-                "maxDuration": 10
+                "maxDuration": 10,
+                "memory": 1024,
+                "includeFiles": ["views/**", "public/**", "uploads/**", "database.sqlite"]
             }
         }
     ],
@@ -18,11 +20,5 @@
             "src": "/(.*)",
             "dest": "/server.js"
         }
-    ],
-    "functions": {
-        "server.js": {
-            "memory": 1024,
-            "maxDuration": 10
-        }
-    }
+    ]
 }
