@@ -224,46 +224,28 @@ app.post("/login", loginLimiter, async (req, res) => {
 
     try {
         const user = await new Promise((resolve, reject) => {
-            db.get("SELECT * FROM users WHERE username = ?", [username], (err, user) => {
+            db.get("SELECT * FROM users WHERE username = ? LIMIT 1", [username], (err, user) => {
                 if (err) reject(err);
                 else resolve(user);
             });
         });
 
         if (!user || user.password !== hashedPass) {
-            if (user) {
-                db.run("UPDATE users SET failed_attempts = failed_attempts + 1 WHERE id = ?", [user.id]);
-
-                if (user.failed_attempts >= 4) {
-                    const lockTime = new Date(Date.now() + 15 * 60000); // 15 minutes
-                    db.run("UPDATE users SET locked_until = ? WHERE id = ?", [lockTime, user.id]);
-                }
-            }
-
             return res.render("login", { error: "Invalid username or password" });
         }
 
-        if (user.locked_until && new Date(user.locked_until) > new Date()) {
-            return res.render("login", {
-                error: "Account is temporarily locked. Please try again later.",
-            });
-        }
-
-        db.run("UPDATE users SET failed_attempts = 0, locked_until = NULL, last_login = CURRENT_TIMESTAMP WHERE id = ?", [user.id]);
-
         const token = jwt.sign(user, SECRET, {
             expiresIn: remember ? "7d" : "1h",
-            algorithm: "HS512",
+            algorithm: "HS256",
         });
 
         res.cookie("token", token, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "strict",
+            secure: true,
+            sameSite: "lax",
             maxAge: remember ? 7 * 24 * 60 * 60 * 1000 : 60 * 60 * 1000,
         });
 
-        addLog(user, "Logged in", req);
         res.redirect("/upload");
     } catch (err) {
         console.error("Login error:", err);
