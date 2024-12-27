@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap">
+    <title>Login</title>
+    <style>
+        .custom-checkbox {
+            position: relative;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            padding-left: 35px;
+            user-select: none;
+            color: #fff;
+        }
+        
+        .custom-checkbox input {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+            height: 0;
+            width: 0;
+        }
+        
+        .checkmark {
+            position: absolute;
+            left: 0;
+            height: 25px;
+            width: 25px;
+            background-color: #111;
+            border: 2px solid #333;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+        
+        .custom-checkbox:hover input ~ .checkmark {
+            background-color: #181818;
+        }
+        
+        .custom-checkbox input:checked ~ .checkmark {
+            background-color: rgb(0 107 179);
+            border-color: rgb(0 107 179);
+        }
+        
+        .checkmark:after {
+            content: "";
+            position: absolute;
+            display: none;
+            left: 9px;
+            top: 5px;
+            width: 5px;
+            height: 10px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+        
+        .custom-checkbox input:checked ~ .checkmark:after {
+            display: block;
+        }
+
+        .modern-input {
+            width: 100%;
+            padding: 12px 16px;
+            background: #111;
+            border: 2px solid #333;
+            border-radius: 12px;
+            color: #fff;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            margin-bottom: 1rem;
+        }
+
+        .modern-input:focus {
+            outline: none;
+            border-color: rgb(0 107 179);
+            background: #181818;
+        }
+
+        .modern-input::placeholder {
+            color: #666;
+        }
+
+        .button {
+            position: relative;
+            transition: all 0.3s ease-in-out;
+            padding-block: 0.5rem;
+            padding-inline: 1.25rem;
+            background-color: rgb(0 107 179);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #ffff;
+            gap: 10px;
+            font-weight: bold;
+            border: none;
+            outline: none;
+            overflow: hidden;
+            font-size: 15px;
+            width: 100%;
+        }
+
+        .icon {
+            width: 24px;
+            height: 24px;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .button:hover {
+            transform: scale(1.02);
+            background-color: rgb(0 127 199);
+        }
+
+        .button:hover .icon {
+            transform: translate(4px);
+        }
+
+        .button:hover::before {
+            animation: shine 1.5s ease-out infinite;
+        }
+
+        .button::before {
+            content: "";
+            position: absolute;
+            width: 100px;
+            height: 100%;
+            background-image: linear-gradient(
+                120deg,
+                rgba(255, 255, 255, 0) 30%,
+                rgba(255, 255, 255, 0.8),
+                rgba(255, 255, 255, 0) 70%
+            );
+            top: 0;
+            left: -100px;
+            opacity: 0.6;
+        }
+
+        @keyframes shine {
+            0% {
+                left: -100px;
+            }
+
+            60% {
+                left: 100%;
+            }
+
+            to {
+                left: 100%;
+            }
+        }
+    </style>
+</head>
+<body class="dark-theme" style="background: #000;">
+    <div id="preloader">
+        <div class="spinner"></div>
+    </div>
+    <div class="login-container fade-in" style="min-height: 100vh; display: flex; align-items: center; justify-content: center;">
+        <div class="glass-card" style="width: 100%; max-width: 400px; padding: 2.5rem; background: #111; border-radius: 16px; border: 1px solid #333; display: flex; flex-direction: column; align-items: center;">
+            <div class="logo-container" style="text-align: center; margin-bottom: 2rem;">
+                <svg width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="rgb(0 107 179)" stroke-width="2">
+                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                </svg>
+                <h1 style="font-size: 1.75rem; margin-top: 1rem; color: #fff;">Sign In</h1>
+            </div>
+            <% if (error) { %>
+                <div class="error-message" style="background: rgba(248, 113, 113, 0.1); border-left: 4px solid #f87171; color: #f87171; text-align: left; margin-bottom: 1.5rem; padding: 1rem; border-radius: 6px; width: 100%; display: flex; align-items: center; gap: 0.75rem;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="8" x2="12" y2="12"></line>
+                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                    </svg>
+                    <span style="font-size: 0.95rem;"><%= error %></span>
+                </div>
+            <% } %>
+            <form method="POST" action="/login" class="modern-form" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
+                <div class="form-group" style="width: 100%; display: flex; justify-content: center;">
+                    <input type="text" name="username" placeholder="Username" required class="modern-input" style="width: 100%; max-width: 350px;">
+                </div>
+                <div class="form-group" style="width: 100%; display: flex; justify-content: center;">
+                    <input type="password" name="password" placeholder="Password" required class="modern-input" style="width: 100%; max-width: 350px;">
+                </div>
+                <div class="form-group" style="margin: 1.5rem 0; width: 100%; max-width: 350px;">
+                    <label class="custom-checkbox">
+                        Remember me for 7 days
+                        <input type="checkbox" name="remember">
+                        <span class="checkmark"></span>
+                    </label>
+                </div>
+                <button type="submit" class="button" style="width: 100%; max-width: 350px;">
+                    Login
+                    <svg fill="currentColor" viewBox="0 0 24 24" class="icon">
+                        <path
+                            clip-rule="evenodd"
+                            d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zm4.28 10.28a.75.75 0 000-1.06l-3-3a.75.75 0 10-1.06 1.06l1.72 1.72H8.25a.75.75 0 000 1.5h5.69l-1.72 1.72a.75.75 0 101.06 1.06l3-3z"
+                            fill-rule="evenodd"
+                        ></path>
+                    </svg>
+                </button>
+            </form>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('preloader').style.display = 'none';
+            document.body.classList.add('loaded');
+            
+            const card = document.querySelector('.glass-card');
+            card.addEventListener('mouseenter', () => {
+                card.style.transform = 'translateY(-5px)';
+                card.style.transition = 'transform 0.3s ease';
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'translateY(0)';
+            });
+        });
+    </script>
+</body>
+</html>

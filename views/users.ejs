@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="/css/preloader.css">
+    <title>Manage Users</title>
+    <style>
+        :root {
+            --bg-primary: #000000;
+            --bg-secondary: #111111;
+            --accent-color: #2196f3;
+            --text-primary: #f5f5fa;
+            --text-secondary: #99aacc;
+            --card-bg: rgba(17, 17, 17, 0.9);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --danger-color: #f44336;
+            --success-color: #4caf50;
+        }
+
+        body {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        .container {
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .create-user-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .form {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        input, select {
+            padding: 0.75rem 1rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 1rem;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.2);
+        }
+
+        .btn {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            background: #1976d2;
+            transform: translateY(-2px);
+        }
+
+        .btn-delete {
+            background: var(--danger-color);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .users-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .user-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 1.5rem;
+            border: 1px solid var(--border-color);
+            transition: transform 0.3s ease;
+        }
+
+        .user-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .user-avatar {
+            background: var(--accent-color);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .user-details h3 {
+            margin: 0;
+            color: var(--text-primary);
+        }
+
+        .user-role {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .user-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: var(--bg-secondary);
+            padding: 2rem;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 500px;
+        }
+    </style>
+</head>
+<body>
+    <%- include('partials/preloader') %>
+    <%- include('partials/navbar') %>
+    <main class="fade-in">
+        <div class="container">
+            <div class="header">
+                <h1>Manage Users</h1>
+                <button class="btn" onclick="openCreateModal()">
+                    <i class="fas fa-plus"></i> Add New User
+                </button>
+            </div>
+
+            <div class="users-grid">
+                <% users.forEach(user => { %>
+                    <div class="user-card">
+                        <div class="user-info">
+                            <div class="user-avatar">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            <div class="user-details">
+                                <h3><%= user.username %></h3>
+                                <span class="user-role"><%= user.role %></span>
+                            </div>
+                        </div>
+                        <div class="user-actions">
+                            <button onclick="openEditModal('<%= user.id %>', '<%= user.username %>', '<%= user.role %>')" class="btn">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                            <form method="POST" action="/deleteUser" style="display:inline;">
+                                <input type="hidden" name="id" value="<%= user.id %>">
+                                <button class="btn-delete" onclick="return confirm('Are you sure you want to delete this user?')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                <% }); %>
+            </div>
+        </div>
+    </main>
+
+    <div id="createModal" class="modal">
+        <div class="modal-content">
+            <h2>Create New User</h2>
+            <form method="POST" action="/createUser" class="form">
+                <input type="text" name="username" placeholder="Username" required>
+                <input type="password" name="password" placeholder="Password" required>
+                <select name="role">
+                    <option value="user">User</option>
+                    <option value="admin">Admin</option>
+                </select>
+                <button type="submit" class="btn">Create User</button>
+                <button type="button" class="btn-delete" onclick="closeCreateModal()">Cancel</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <div class="edit-header">
+                <div class="avatar-circle">
+                    <i class="fas fa-user-circle fa-4x"></i>
+                </div>
+                <h2>Edit User Profile</h2>
+            </div>
+            <form method="POST" action="/updateUser" class="form">
+                <input type="hidden" id="editUserId" name="id">
+                
+                <div class="form-grid">
+                    <div class="input-group">
+                        <div class="input-wrapper">
+                            <i class="fas fa-at input-icon"></i>
+                            <input type="text" id="editUsername" name="username" placeholder="Username" required>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <div class="input-wrapper">
+                            <i class="fas fa-key input-icon"></i>
+                            <input type="password" id="editPassword" name="password" placeholder="New Password">
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <div class="input-wrapper">
+                            <i class="fas fa-shield-alt input-icon"></i>
+                            <select id="editRole" name="role">
+                                <option value="user">User</option>
+                                <option value="admin">Admin</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button type="button" class="btn-secondary" onclick="closeEditModal()">
+                        <i class="fas fa-arrow-left"></i> Cancel
+                    </button>
+                    <button type="submit" class="btn-primary">
+                        <i class="fas fa-save"></i> Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                document.getElementById('preloader').classList.add('hidden');
+                document.body.classList.remove('hidden');
+                document.body.classList.add('loaded');
+            }, 500);
+        });
+
+        function openCreateModal() {
+            document.getElementById('createModal').style.display = 'flex';
+        }
+
+        function closeCreateModal() {
+            document.getElementById('createModal').style.display = 'none';
+        }
+
+        function openEditModal(id, username, role) {
+            document.getElementById('editUserId').value = id;
+            document.getElementById('editUsername').value = username;
+            document.getElementById('editRole').value = role;
+            document.getElementById('editPassword').value = '';
+            document.getElementById('editModal').style.display = 'flex';
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').style.display = 'none';
+        }
+
+        window.onclick = function(event) {
+            if (event.target.className === 'modal') {
+                event.target.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>

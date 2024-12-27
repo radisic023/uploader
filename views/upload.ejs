@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>Upload Files</title>
+    <style>
+        :root {
+            --bg-primary: #000000;
+            --bg-secondary: #111111;
+            --accent-color: #2196f3;
+            --text-primary: #f5f5fa;
+            --text-secondary: #99aacc;
+            --card-bg: rgba(17, 17, 17, 0.9);
+            --border-color: rgba(255, 255, 255, 0.08);
+        }
+
+        body {
+            background: var(--bg-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            color: var(--text-primary);
+        }
+
+        main {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            height: 600px;
+            width: 500px;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2.5rem;
+            gap: 2rem;
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--border-color);
+        }
+
+        .form {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .header {
+            flex: 1;
+            width: 100%;
+            border: 2px dashed var(--accent-color);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            padding: 3rem 2rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            background: var(--bg-secondary);
+        }
+
+        .header.drag-over {
+            border-color: var(--accent-color);
+            transform: scale(1.02);
+            background: rgba(33, 150, 243, 0.1);
+        }
+
+        .header svg {
+            height: 120px;
+            stroke: var(--accent-color);
+            transition: all 0.3s ease;
+            margin-bottom: 1.5rem;
+        }
+
+        .header.drag-over svg {
+            transform: scale(1.1);
+        }
+
+        .header p {
+            text-align: center;
+            color: var(--text-primary);
+            margin: 1rem 0;
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .form-controls {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+            align-items: center;
+        }
+
+        select, input[type="password"] {
+            width: 100%;
+            padding: 14px;
+            border-radius: 8px;
+            border: 1px solid rgba(33, 150, 243, 0.2);
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+
+        select:focus, input[type="password"]:focus {
+            border-color: var(--accent-color);
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(33, 150, 243, 0.2);
+        }
+
+        .footer {
+            background: rgba(33, 150, 243, 0.1);
+            width: 100%;
+            padding: 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-primary);
+            border: 1px solid rgba(33, 150, 243, 0.2);
+            transition: all 0.3s ease;
+            font-size: 0.95rem;
+            margin-top: 1rem;
+        }
+
+        .footer:hover {
+            background: rgba(33, 150, 243, 0.15);
+            transform: translateY(-2px);
+        }
+
+        #fileUpload {
+            display: none;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #2196f3, #1976d2);
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            max-width: 100%;
+            text-align: center;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(33, 150, 243, 0.4);
+        }
+
+        .btn::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: -100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+        }
+
+        .btn:hover::after {
+            left: 100%;
+        }
+    </style>
+</head>
+<body class="dark-theme">
+    <div id="preloader">
+        <div class="spinner"></div>
+    </div>
+    <%- include('partials/navbar') %>
+    <main class="fade-in">
+        <div class="container">
+            <form method="POST" action="/upload" enctype="multipart/form-data" class="form">
+                <div class="header" id="dropZone">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M7 10V9C7 6.23858 9.23858 4 12 4C14.7614 4 17 6.23858 17 9V10C19.2091 10 21 11.7909 21 14C21 15.4806 20.1956 16.8084 19 17.5M7 10C4.79086 10 3 11.7909 3 14C3 15.4806 3.8044 16.8084 5 17.5M7 10C7.43285 10 7.84965 10.0688 8.24006 10.1959M12 12V21M12 12L15 15M12 12L9 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <p>Drag & drop your file here or click to browse</p>
+                    <label for="fileUpload" class="footer">
+                        Choose File
+                    </label>
+                    <input type="file" name="file" id="fileUpload" required>
+                </div>
+
+                <div class="form-controls">
+                    <select name="tag" id="tag">
+                        <option value="">Select Tag (optional)</option>
+                        <option value="games">Games</option>
+                        <option value="discord">Discord</option>
+                        <option value="sonstiges">Sonstiges</option>
+                        <option value="bild">Bild</option>
+                        <option value="datei">Datei</option>
+                    </select>
+
+                    <input type="password" name="password" id="passwordField" placeholder="Set Password (optional)">
+
+                    <button type="submit" class="btn">Upload File</button>
+                </div>
+            </form>
+        </div>
+    </main>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('preloader').style.display = 'none';
+            document.body.classList.add('loaded');
+            
+            const dropZone = document.getElementById('dropZone');
+            const fileInput = document.getElementById('fileUpload');
+
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                dropZone.addEventListener(eventName, preventDefaults, false);
+            });
+
+            function preventDefaults (e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropZone.addEventListener(eventName, highlight, false);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropZone.addEventListener(eventName, unhighlight, false);
+            });
+
+            function highlight(e) {
+                dropZone.classList.add('drag-over');
+            }
+
+            function unhighlight(e) {
+                dropZone.classList.remove('drag-over');
+            }
+
+            dropZone.addEventListener('drop', handleDrop, false);
+
+            function handleDrop(e) {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                fileInput.files = files;
+                updateFileName(files[0]?.name);
+            }
+            
+            fileInput.addEventListener('change', function(e) {
+                updateFileName(e.target.files[0]?.name);
+            });
+
+            function updateFileName(fileName) {
+                document.querySelector('.footer').textContent = fileName || 'No file selected';
+            }
+        });
+    </script>
+</body>
+</html>

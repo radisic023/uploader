@@ -1,0 +1,104 @@
+<nav class="navbar" style="background: #0a0a0a; border-bottom: 1px solid #222; padding: 1rem 2rem;">
+    <div style="display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; width: 100%;">
+        <ul style="display: flex; gap: 2rem; list-style: none; margin: 0; padding: 0;">
+            <% if (user) { %>
+                <% if (user.role === 'admin') { %>
+                    <li class="nav-category" style="position: relative;">
+                        <a href="#" style="color: #888; text-decoration: none; font-weight: 500; display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; border-radius: 6px;">
+                            <i class="fas fa-cog" style="color: #666;"></i>Management
+                            <i class="fas fa-chevron-down" style="font-size: 0.8rem; margin-left: 0.3rem;"></i>
+                        </a>
+                        <ul style="position: absolute; background: #151515; border: 1px solid #2a2a2a; border-radius: 8px; padding: 0.5rem; margin-top: 0.5rem; min-width: 200px; display: none; z-index: 100; list-style: none;">
+                            <li><a href="/dashboard" class="<%= currentPage === '/dashboard' ? 'active' : '' %>" style="color: #888; text-decoration: none; padding: 0.5rem 1rem; display: flex; align-items: center; gap: 0.5rem;"><i class="fas fa-chart-line"></i>Dashboard</a></li>
+                            <li><a href="/users" class="<%= currentPage === '/users' ? 'active' : '' %>" style="color: #888; text-decoration: none; padding: 0.5rem 1rem; display: flex; align-items: center; gap: 0.5rem;"><i class="fas fa-users"></i>Users</a></li>
+                            <li><a href="/logs" class="<%= currentPage === '/logs' ? 'active' : '' %>" style="color: #888; text-decoration: none; padding: 0.5rem 1rem; display: flex; align-items: center; gap: 0.5rem;"><i class="fas fa-history"></i>Logs</a></li>
+                        </ul>
+                    </li>
+                <% } %>
+
+                <li>
+                    <a href="/manage" class="<%= currentPage === '/manage' ? 'active' : '' %>" style="color: #888; text-decoration: none; padding: 0.5rem 1rem; display: flex; align-items: center; gap: 0.5rem; border-radius: 6px;">
+                        <i class="fas fa-folder"></i>Manage Files
+                    </a>
+                </li>
+
+                <li>
+                    <a href="/upload" class="<%= currentPage === '/upload' ? 'active' : '' %>" style="color: #888; text-decoration: none; padding: 0.5rem 1rem; display: flex; align-items: center; gap: 0.5rem; border-radius: 6px;">
+                        <i class="fas fa-upload"></i>Upload
+                    </a>
+                </li>
+            <% } %>
+        </ul>
+
+        <div style="position: relative;">
+            <% if (user) { %>
+                <div class="account-menu" style="display: flex; align-items: center; gap: 1rem; cursor: pointer; padding: 0.5rem 1rem; border-radius: 8px; background: #151515; border: 1px solid #2a2a2a; transition: transform 0.2s;">
+                    <div style="width: 32px; height: 32px; border-radius: 50%; background: #1a1a1a; border: 1px solid #2a2a2a; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-user" style="color: #666;"></i>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 0.2rem;">
+                        <span style="color: #888; font-size: 0.9rem;"><%= user.username %></span>
+                        <a href="/logout" style="color: #666; font-size: 0.8rem; text-decoration: none; transition: transform 0.2s;">Sign out</a>
+                    </div>
+                </div>
+            <% } else { %>
+                <a href="/login" style="color: #888; text-decoration: none; padding: 0.6rem 1.2rem; border-radius: 8px; background: #151515; display: flex; align-items: center; gap: 0.5rem; transition: transform 0.2s; border: 1px solid #2a2a2a;">
+                    <i class="fas fa-sign-in-alt"></i>
+                    Login
+                </a>
+            <% } %>
+        </div>
+    </div>
+</nav>
+
+<script>
+document.querySelectorAll('.nav-category').forEach(category => {
+    const link = category.querySelector('a');
+    const dropdown = category.querySelector('ul');
+    let timeoutId;
+    
+    category.addEventListener('mouseenter', () => {
+        clearTimeout(timeoutId);
+        dropdown.style.display = 'block';
+    });
+    
+    category.addEventListener('mouseleave', () => {
+        timeoutId = setTimeout(() => {
+            dropdown.style.display = 'none';
+        }, 100); // wichtiger delay!!!! 
+    });
+
+    dropdown.addEventListener('mouseenter', () => {
+        clearTimeout(timeoutId);
+        dropdown.style.display = 'block';
+    });
+
+    dropdown.addEventListener('mouseleave', () => {
+        dropdown.style.display = 'none';
+    });
+});
+</script>
+
+<style>
+.navbar a.active {
+    color: #fff !important;
+    background: #151515 !important;
+    border: 1px solid #2a2a2a;
+    transform: translateY(-2px);
+}
+
+.navbar a:hover {
+    color: #fff;
+    background: #151515;
+    border: 1px solid #2a2a2a;
+    transform: translateY(-2px);
+}
+
+.account-menu:hover {
+    transform: translateY(-2px);
+}
+
+.account-menu a:hover {
+    color: #fff;
+}
+</style>

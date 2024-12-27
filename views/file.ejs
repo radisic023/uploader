@@ -1,0 +1,47 @@
+<% const title = "Manage Files"; %>
+<% const content = `
+    <h1>Manage Files</h1>
+    <input type="text" id="search" placeholder="Search files..." onkeyup="filterFiles()" class="search-input">
+    <table id="fileTable" class="table">
+        <thead>
+            <tr>
+                <th>Filename</th>
+                <th>Type</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% files.forEach(file => { %>
+                <tr>
+                    <td><%= file.filename %></td>
+                    <td><%= file.type %></td>
+                    <td><%= file.active ? 'Active' : 'Inactive' %></td>
+                    <td>
+                        <a href="/file/<%= file.encryptedId %>" class="btn">View</a>
+                        <form method="POST" action="/toggleLink" style="display:inline;">
+                            <input type="hidden" name="id" value="<%= file.id %>">
+                            <button class="btn"><%= file.active ? 'Deactivate' : 'Activate' %></button>
+                        </form>
+                        <form method="POST" action="/deleteFile" style="display:inline;">
+                            <input type="hidden" name="id" value="<%= file.id %>">
+                            <button class="btn-delete">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            <% }); %>
+        </tbody>
+    </table>
+    <script>
+        function filterFiles() {
+            const search = document.getElementById('search').value.toLowerCase();
+            const rows = document.querySelectorAll('#fileTable tbody tr');
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                row.style.display = text.includes(search) ? '' : 'none';
+            });
+        }
+    </script>
+`; %>
+
+<%- include('layout', { title, content }) %>
